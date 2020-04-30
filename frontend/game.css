@@ -102,8 +102,8 @@
   -webkit-border-radius: 5px 0 0 5px;
 }
 
-#mode-toggle.player-selected button.player,
-#mode-toggle.codemaster-selected button.codemaster {
+#mode-toggle.red-selected button.blue,
+#mode-toggle.blue-selected button.red {
   cursor: auto;
   color: #999;
 }

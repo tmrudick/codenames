@@ -18,7 +18,7 @@ export class Game extends React.Component {
       mounted: true,
       settings: Settings.load(),
       mode: 'game',
-      codemaster: false,
+      team: 'red',
     };
   }
 
@@ -101,9 +101,6 @@ export class Game extends React.Component {
       contentType: 'application/json; charset=utf-8',
       dataType: 'json',
       success: data => {
-        if (this.state.game && data.created_at != this.state.game.created_at) {
-          this.setState({ codemaster: false });
-        }
         this.setState({ game: data });
       },
       complete: () => {
@@ -116,14 +113,11 @@ export class Game extends React.Component {
 
   public toggleRole(e, role) {
     e.preventDefault();
-    this.setState({ codemaster: role == 'codemaster' });
+    this.setState({ team: role == 'red' ? 'red' : 'blue' })
   }
 
   public guess(e, idx) {
     e.preventDefault();
-    if (this.state.codemaster && !this.state.settings.spymasterMayGuess) {
-      return; // ignore if player is the codemaster
-    }
     if (this.state.game.revealed[idx]) {
       return; // ignore if already revealed
     }
@@ -193,7 +187,7 @@ export class Game extends React.Component {
         timer_duration_ms: this.state.game.timer_duration_ms,
       }),
       g => {
-        this.setState({ game: g, codemaster: false });
+        this.setState({ game: g });
       }
     );
   }
@@ -243,7 +237,7 @@ export class Game extends React.Component {
     }
 
     let endTurnButton;
-    if (!this.state.game.winning_team && !this.state.codemaster) {
+    if (!this.state.game.winning_team) {
       endTurnButton = (
         <div id="end-turn-cont">
           <button onClick={e => this.endTurn(e)} id="end-turn-btn">
@@ -287,7 +281,7 @@ export class Game extends React.Component {
       <div
         id="game-view"
         className={
-          (this.state.codemaster ? 'codemaster' : 'player') +
+          (this.state.team) +
           this.extraClasses()
         }
       >
@@ -329,9 +323,7 @@ export class Game extends React.Component {
         </div>
         <form
           id="mode-toggle"
-          className={
-            this.state.codemaster ? 'codemaster-selected' : 'player-selected'
-          }
+          className={`${this.state.team}-selected`}
         >
           <SettingsButton
             onClick={e => {
@@ -339,16 +331,16 @@ export class Game extends React.Component {
             }}
           />
           <button
-            onClick={e => this.toggleRole(e, 'player')}
-            className="player"
+            onClick={e => this.toggleRole(e, 'blue')}
+            className="blue"
           >
-            Player
+            Blue
           </button>
           <button
-            onClick={e => this.toggleRole(e, 'codemaster')}
-            className="codemaster"
+            onClick={e => this.toggleRole(e, 'red')}
+            className="red"
           >
-            Spymaster
+            Red
           </button>
           <button onClick={e => this.nextGame(e)} id="next-game-btn">
             Next game
