@@ -281,7 +281,7 @@ export class Game extends React.Component {
       <div
         id="game-view"
         className={
-          (this.state.team) +
+          (`${this.state.team}-team`) +
           this.extraClasses()
         }
       >
@@ -311,6 +311,8 @@ export class Game extends React.Component {
               className={
                 'cell ' +
                 this.state.game.layout[idx] +
+                ' ' +
+                (this.state.team === this.state.game.layout[idx] ? `${this.state.team}` : '') +
                 ' ' +
                 (this.state.codemaster && !this.state.settings.spymasterMayGuess ? 'disabled ' : '') +
                 (this.state.game.revealed[idx] ? 'revealed' : 'hidden-word')

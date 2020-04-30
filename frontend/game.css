@@ -148,10 +148,10 @@
   background: #e8e8e8;
 }
 
-.codemaster .red.hidden-word {
+.red-team .red.hidden-word {
   color: #d13030;
 }
-.codemaster .blue.hidden-word {
+.blue-team .blue.hidden-word {
   color: #4183cc;
 }
 .codemaster .black.hidden-word {
