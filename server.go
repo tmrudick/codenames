@@ -308,7 +308,7 @@ func (s *Server) handleStats(rw http.ResponseWriter, req *http.Request) {
 	var inProgress, createdWithinAnHour int
 	for _, gh := range s.games {
 		gh.mu.Lock()
-		if gh.g.WinningTeam == nil && gh.g.anyRevealed() {
+		if gh.g.anyRevealed() {
 			inProgress++
 		}
 		if hourAgo.Before(gh.g.CreatedAt) {
@@ -330,7 +330,7 @@ func (s *Server) cleanupOldGames() {
 	defer s.mu.Unlock()
 	for id, gh := range s.games {
 		gh.mu.Lock()
-		if gh.g.WinningTeam != nil && gh.g.CreatedAt.Add(3*time.Hour).Before(time.Now()) {
+		if gh.g.CreatedAt.Add(3*time.Hour).Before(time.Now()) {
 			delete(s.games, id)
 			log.Printf("Removed completed game %s\n", id)
 		} else if gh.g.CreatedAt.Add(12 * time.Hour).Before(time.Now()) {

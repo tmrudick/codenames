@@ -16,7 +16,10 @@ const (
 	Neutral Team = iota
 	Red
 	Blue
+	RedBlue
 	Black
+	RedBlack
+	BlueBlack
 )
 
 func (t Team) String() string {
@@ -25,6 +28,12 @@ func (t Team) String() string {
 		return "red"
 	case Blue:
 		return "blue"
+	case RedBlue:
+		return "red-blue"
+	case RedBlack:
+		return "red-black"
+	case BlueBlack:
+		return "blue-black"
 	case Black:
 		return "black"
 	default:
@@ -54,6 +63,12 @@ func (t *Team) UnmarshalJSON(b []byte) error {
 		*t = Red
 	case "blue":
 		*t = Blue
+	case "red-blue":
+		*t = RedBlue
+	case "red-black":
+		*t = RedBlack
+	case "blue-black":
+		*t = BlueBlack
 	case "black":
 		*t = Black
 	default:
@@ -120,8 +135,8 @@ type Game struct {
 	ID              string    `json:"id"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
-	StartingTeam    Team      `json:"starting_team"`
-	WinningTeam     *Team     `json:"winning_team,omitempty"`
+	HasWon			bool	  `json:"has_won,omitempty"`
+	HasLost		    bool      `json:"has_lost,omitempty"`
 	Words           []string  `json:"words"`
 	Layout          []Team    `json:"layout"`
 	TimerDurationMS int64     `json:"timer_duration_ms,omitempty"`
@@ -134,35 +149,31 @@ func (g *Game) StateID() string {
 }
 
 func (g *Game) checkWinningCondition() {
-	if g.WinningTeam != nil {
-		return
-	}
-	var redRemaining, blueRemaining bool
+	var remainingCards bool
 	for i, t := range g.Layout {
 		if g.Revealed[i] {
 			continue
 		}
+
 		switch t {
 		case Red:
-			redRemaining = true
 		case Blue:
-			blueRemaining = true
+		case RedBlue:
+			g.HasWon = false
+			remainingCards = true
 		}
 	}
-	if !redRemaining {
-		winners := Red
-		g.WinningTeam = &winners
-	}
-	if !blueRemaining {
-		winners := Blue
-		g.WinningTeam = &winners
+
+	if !remainingCards {
+		g.HasWon = true
 	}
 }
 
 func (g *Game) NextTurn(currentTurn int) bool {
-	if g.WinningTeam != nil {
+	if !g.HasWon && !g.HasLost {
 		return false
 	}
+
 	// TODO: remove currentTurn != 0 once we can be sure all
 	// clients are running up-to-date versions of the frontend.
 	if g.Round != currentTurn && currentTurn != 0 {
@@ -184,25 +195,14 @@ func (g *Game) Guess(idx int) error {
 	g.UpdatedAt = time.Now()
 	g.Revealed[idx] = true
 
-	if g.Layout[idx] == Black {
-		winners := g.currentTeam().Other()
-		g.WinningTeam = &winners
+	if g.Layout[idx] == Black || g.Layout[idx] == BlueBlack || g.Layout[idx] == RedBlack {
+		g.HasLost = true
 		return nil
 	}
 
 	g.checkWinningCondition()
-	if g.Layout[idx] != g.currentTeam() {
-		g.Round = g.Round + 1
-		g.RoundStartedAt = time.Now()
-	}
-	return nil
-}
 
-func (g *Game) currentTeam() Team {
-	if g.Round%2 == 0 {
-		return g.StartingTeam
-	}
-	return g.StartingTeam.Other()
+	return nil
 }
 
 func newGame(id string, state GameState, timerDurationMS int64, enforceTimer bool) *Game {
@@ -215,7 +215,6 @@ func newGame(id string, state GameState, timerDurationMS int64, enforceTimer boo
 		ID:              id,
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
-		StartingTeam:    Team(randRnd.Intn(2)) + Red,
 		Words:           make([]string, 0, wordsPerGame),
 		Layout:          make([]Team, 0, wordsPerGame),
 		GameState:       state,
@@ -235,11 +234,13 @@ func newGame(id string, state GameState, timerDurationMS int64, enforceTimer boo
 
 	// Pick a random permutation of team assignments.
 	var teamAssignments []Team
-	teamAssignments = append(teamAssignments, Red.Repeat(8)...)
-	teamAssignments = append(teamAssignments, Blue.Repeat(8)...)
-	teamAssignments = append(teamAssignments, Neutral.Repeat(7)...)
+	teamAssignments = append(teamAssignments, Red.Repeat(6)...)
+	teamAssignments = append(teamAssignments, Blue.Repeat(6)...)
+	teamAssignments = append(teamAssignments, RedBlue.Repeat(3)...)
+	teamAssignments = append(teamAssignments, RedBlack.Repeat(2)...)
+	teamAssignments = append(teamAssignments, BlueBlack.Repeat(2)...)
 	teamAssignments = append(teamAssignments, Black)
-	teamAssignments = append(teamAssignments, game.StartingTeam)
+	teamAssignments = append(teamAssignments, Neutral.Repeat(5)...)
 
 	shuffleCount := randRnd.Intn(5) + 5
 	for i := 0; i < shuffleCount; i++ {

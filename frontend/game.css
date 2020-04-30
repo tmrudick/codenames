@@ -149,10 +149,10 @@
 }
 
 .red-team .red.hidden-word {
-  color: #d13030;
+  color: #18af38;
 }
 .blue-team .blue.hidden-word {
-  color: #4183cc;
+  color: #18af38;
 }
 .codemaster .black.hidden-word {
   background: #999;
@@ -162,11 +162,11 @@
 }
 
 .board .red.revealed {
-  background: #d13030;
+  background: #18af38;
   color: #fff;
 }
 .board .blue.revealed {
-  background: #4183cc;
+  background: #18af38;
   color: #fff;
 }
 .board .black.revealed {
@@ -194,23 +194,23 @@
 
 .color-blind .blue-remaining,
 .color-blind #status-line.blue #status {
-  border: 2px solid #4183cc;
+  border: 2px solid #18af38;
 }
 
 .color-blind .red-remaining,
 .color-blind #status-line.red #status {
-  border: 2px dashed #d13030;
+  border: 2px dashed #18af38;
 }
 
 .color-blind.codemaster .red.hidden-word,
 .color-blind .red.revealed {
-  outline: 2px dashed #d13030;
+  outline: 2px dashed #18af38;
   border: 1px solid white;
 }
 
 .color-blind.codemaster .blue.hidden-word,
 .color-blind .blue.revealed {
-  outline: 2px solid #4183cc;
+  outline: 2px solid #18af38;
   border: 1px solid white;
 }
 
