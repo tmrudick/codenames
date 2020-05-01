@@ -107,7 +107,7 @@ export class Game extends React.Component {
     if (this.state.game.revealed[idx]) {
       return; // ignore if already revealed
     }
-    if (this.state.game.winning_team) {
+    if (this.state.game.has_lost || this.state.game.has_won) {
       return; // ignore if game is over
     }
     $.post(
@@ -142,7 +142,7 @@ export class Game extends React.Component {
     e.preventDefault();
     // Ask for confirmation when current game hasn't finished
     let allowNextGame =
-      this.state.game.winning_team ||
+      (this.state.game.has_won || this.state.game.has_lost) ||
       confirm('Do you really want to start a new game?');
     if (!allowNextGame) {
       return;
@@ -183,7 +183,7 @@ export class Game extends React.Component {
   }
 
   public getTeamClassName(card) {
-    if (card.indexOf('black') != -1) {
+    if (card === 'black' || card === `${this.state.team}-black`) {
       return 'black';
     }
 

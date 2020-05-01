@@ -157,7 +157,9 @@ func (g *Game) checkWinningCondition() {
 
 		switch t {
 		case Red:
+			fallthrough
 		case Blue:
+			fallthrough
 		case RedBlue:
 			g.HasWon = false
 			remainingCards = true
