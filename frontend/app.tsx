@@ -29,7 +29,7 @@ export class App extends React.Component {
         <div id="topbar">
           <h1>
             <a href={'http://' + window.location.host}>
-              Codenames
+              Codenames Duet
             </a>
           </h1>
         </div>

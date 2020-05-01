@@ -11,7 +11,7 @@ window.$ = window.jQuery = jquery;
 
 export const Lobby = ({ defaultGameID }) => {
   const [newGameName, setNewGameName] = React.useState(defaultGameID);
-  const [selectedWordSets, setSelectedWordSets] = React.useState(['English (Original)']);
+  const [selectedWordSets, setSelectedWordSets] = React.useState(['English (Duet)']);
   const [customWordsText, setCustomWordsText] = React.useState('');
   const [words, setWords] = React.useState({ ...OriginalWords, 'Custom': [] });
   const [warning, setWarning] = React.useState(null);
@@ -78,7 +78,7 @@ export const Lobby = ({ defaultGameID }) => {
       <div id="available-games">
         <form id="new-game">
           <p className="intro">
-            Play Codenames online across multiple devices on a shared board. To
+            Play Codenames Duet online across multiple devices on a shared board. To
             create a new game or join an existing game, enter a game identifier
             and click 'GO'.
           </p>
